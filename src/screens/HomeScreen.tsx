@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 
 const HomeScreen = () => {
@@ -9,15 +9,16 @@ const HomeScreen = () => {
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
+      paddingTop: 10,
     },
-    headerScroll: {
-      padding: 16,
-      flexDirection: 'row',
+    categoryList: {
+      paddingHorizontal: 10,
     },
     categoryItem: {
-      padding: 8,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
       marginRight: 8,
-      borderRadius: 8,
+      borderRadius: 6,
       backgroundColor: '#444444',
     },
     categoryText: {
@@ -28,30 +29,35 @@ const HomeScreen = () => {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
+      paddingHorizontal: 16,
     },
     header: {
-      fontSize: 24,
+      fontSize: 22,
       fontWeight: 'bold',
-      marginBottom: 20,
+      marginBottom: 12,
       color: theme.colors.text,
     },
   });
 
   return (
     <View style={styles.container}>
-      {/* Horizontal ScrollView for Followed Categories */}
-      <ScrollView horizontal style={styles.headerScroll} showsHorizontalScrollIndicator={false}>
-        {followedCategories.map((category, index) => (
-          <View key={index} style={styles.categoryItem}>
-            <Text style={styles.categoryText}>{category}</Text>
+      {/* Horizontal FlatList for better performance */}
+      <FlatList
+        data={followedCategories}
+        horizontal
+        keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={styles.categoryList}
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <View style={styles.categoryItem}>
+            <Text style={styles.categoryText}>{item}</Text>
           </View>
-        ))}
-      </ScrollView>
+        )}
+      />
 
       {/* Main Content */}
       <View style={styles.content}>
         <Text style={styles.header}>Home Screen</Text>
-        {/* Add your main content here */}
       </View>
     </View>
   );
