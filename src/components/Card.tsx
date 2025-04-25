@@ -1,80 +1,163 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  ImageSourcePropType,
+} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  withSpring,
+  useSharedValue,
+} from 'react-native-reanimated';
+import { useTheme } from '../theme/ThemeContext';
+
+const { width } = Dimensions.get('window');
 
 interface CardProps {
-  author: string;
   title: string;
-  subtitle: string;
-  date: string;
-  status: string;
-  points: string;
+  description: string;
+  image?: ImageSourcePropType;
+  onPress?: () => void;
+  category?: string;
+  author?: string;
+  date?: string;
+  readTime?: string;
 }
 
-const Card = ({ author, title, subtitle, date, status, points }: CardProps) => {
-  return (
-    <View style={styles.card}>
-      <Text style={styles.author}>{author}</Text>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{subtitle}</Text>
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
-      <View style={styles.metaContainer}>
-        <View style={styles.metaItem}>
-          <Text style={styles.metaText}>{date}</Text>
-        </View>
-        <View style={[styles.metaItem, styles.status]}>
-          <Text style={styles.metaText}>{status}</Text>
-        </View>
-        <View style={styles.metaItem}>
-          <Text style={styles.metaText}>{points}</Text>
+const Card: React.FC<CardProps> = ({
+  title,
+  description,
+  image,
+  onPress,
+  category,
+  author,
+  date,
+  readTime,
+}) => {
+  const { theme } = useTheme();
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+    };
+  });
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.98);
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1);
+  };
+
+  const styles = StyleSheet.create({
+    container: {
+      backgroundColor: theme.colors.cardBackground,
+      marginHorizontal: theme.spacing.md,
+      marginVertical: theme.spacing.sm,
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+      paddingBottom: theme.spacing.lg,
+    },
+    contentContainer: {
+      flex: 1,
+      paddingRight: theme.spacing.md,
+    },
+    imageContainer: {
+      width: 100,
+      height: 100,
+      marginLeft: theme.spacing.md,
+      borderRadius: theme.borderRadius.sm,
+      overflow: 'hidden',
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+      resizeMode: 'cover',
+    },
+    category: {
+      color: theme.colors.primary,
+      ...theme.typography.caption,
+      marginBottom: theme.spacing.xs,
+      textTransform: 'uppercase',
+    },
+    title: {
+      color: theme.colors.text,
+      ...theme.typography.h3,
+      marginBottom: theme.spacing.xs,
+      fontFamily: 'serif',
+    },
+    description: {
+      color: theme.colors.textSecondary,
+      ...theme.typography.body2,
+      marginBottom: theme.spacing.sm,
+    },
+    metaContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+    },
+    authorText: {
+      color: theme.colors.text,
+      ...theme.typography.caption,
+      fontWeight: '500' as const,
+    },
+    metaDot: {
+      width: 2,
+      height: 2,
+      borderRadius: 1,
+      backgroundColor: theme.colors.textSecondary,
+      marginHorizontal: theme.spacing.xs,
+    },
+    metaText: {
+      color: theme.colors.textSecondary,
+      ...theme.typography.caption,
+    },
+  });
+
+  return (
+    <AnimatedTouchable
+      style={[styles.container, animatedStyle]}
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      activeOpacity={1}
+    >
+      <View style={styles.contentContainer}>
+        {category && <Text style={styles.category}>{category}</Text>}
+        <Text style={styles.title} numberOfLines={2}>
+          {title}
+        </Text>
+        <Text style={styles.description} numberOfLines={2}>
+          {description}
+        </Text>
+        <View style={styles.metaContainer}>
+          {author && <Text style={styles.authorText}>{author}</Text>}
+          {(date || readTime) && <View style={styles.metaDot} />}
+          {date && <Text style={styles.metaText}>{date}</Text>}
+          {readTime && (
+            <>
+              <View style={styles.metaDot} />
+              <Text style={styles.metaText}>{readTime}</Text>
+            </>
+          )}
         </View>
       </View>
-    </View>
+      {image && (
+        <View style={styles.imageContainer}>
+          <Image source={image} style={styles.image} />
+        </View>
+      )}
+    </AnimatedTouchable>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  author: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-  },
-  metaContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  metaItem: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 4,
-    backgroundColor: '#f5f5f5',
-  },
-  status: {
-    backgroundColor: '#e0f7fa',
-  },
-  metaText: {
-    fontSize: 12,
-  },
-});
 
 export default Card;

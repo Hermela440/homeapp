@@ -1,16 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-// Define the shape of the theme
-interface Theme {
-  colors: {
-    background: string;
-    text: string;
-    cardBackground: string;
-    divider: string;
-    tagBackground: string;
-    tagText: string;
-  };
-}
+import { lightTheme, darkTheme } from './theme';
+import type { Theme } from './theme';
 
 // Define the context value type
 interface ThemeContextValue {
@@ -28,24 +18,23 @@ interface ThemeProviderProps {
   children: ReactNode;
 }
 
-// Define light and dark themes
-const darkTheme: Theme = {
-  colors: {
-    background: '#000000',
-    text: '#ffffff',
-    cardBackground: '#1a1a1a',
-    divider: '#444444',
-    tagBackground: '#333333',
-    tagText: '#ffffff',
-  },
-};
-
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(darkTheme); // Default to dark theme
-  const [followedCategories, setFollowedCategories] = useState<string[]>([]);
+  const [followedCategories, setFollowedCategories] = useState<string[]>([
+    'መንፈሳዊ',           // Spiritual
+    'ሰብኣዊ ምዕባለ',      // Personal development
+    'ቢዝነስ',            // Business
+    'መርዓን ሓዳርን',      // Relationship
+    'ሓበሬታ',           // Information
+    'ትረኻታት',          // Stories
+    'ጽባቐ ኣስመራ',       // Beauty of Asmara
+    'ነውሪታት',          // Incedencies
+    'ስድራቤት',          // Family
+    'ቤትሰናይ',          // senaystudio
+  ]);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === darkTheme ? darkTheme : darkTheme));
+    setTheme((prevTheme) => (prevTheme === darkTheme ? lightTheme : darkTheme));
   };
 
   const followCategory = (category: string) => {

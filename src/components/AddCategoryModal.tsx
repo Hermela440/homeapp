@@ -76,6 +76,7 @@ const AddCategoryModal = ({ visible, onClose, onAddCategory }) => {
             onChangeText={setCategoryName}
           />
 
+
           <Text style={{ color: theme.colors.text, marginBottom: 10 }}>Suggestions:</Text>
           <FlatList
             data={suggestions}

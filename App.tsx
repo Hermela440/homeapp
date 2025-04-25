@@ -9,65 +9,101 @@ import BookmarksScreen from './src/screens/BookmarkScreen';
 import ForYouScreen from './src/screens/ForYouScreen';
 import FollowingScreen from './src/screens/FollowingScreen';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Platform } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
 
-const NotificationIcon = () => (
-  <TouchableOpacity style={{ marginRight: 15 }}>
-    <Icon name="notifications-none" size={24} color="white" />
-  </TouchableOpacity>
-);
+const NotificationIcon = () => {
+  const { theme } = useTheme();
+  return (
+    <TouchableOpacity style={{ marginRight: theme.spacing.md }}>
+      <Icon name="notifications-none" size={24} color={theme.colors.text} />
+    </TouchableOpacity>
+  );
+};
 
 const App = () => {
   return (
-    <ThemeProvider>
-      <NavigationContainer>
-        <Tab.Navigator
-          screenOptions={({ route }) => {
-            const { theme } = useTheme();
-            return {
-              tabBarIcon: ({ focused, color, size }) => {
-                let iconName;
-                if (route.name === 'Home') {
-                  iconName = 'home';
-                } else if (route.name === 'Search') {
-                  iconName = 'search';
-                } else if (route.name === 'bookmark') {
-                  iconName = 'bookmark';
-                } else if (route.name === 'Following') {
-                  iconName = 'people';
-                }
-                return <Icon name={iconName} size={size} color={color} />;
-              },
-              tabBarActiveTintColor: '#FFFFFF',
-              tabBarInactiveTintColor: '#888888',
-              tabBarStyle: {
-                backgroundColor: '#121212',
-                borderTopWidth: 0,
-                paddingBottom: 5,
-              },
-              headerStyle: {
-                backgroundColor: '#121212',
-                shadowColor: 'transparent',
-              },
-              headerTitleStyle: {
-                color: 'white',
-                fontSize: 22,
-                fontWeight: 'bold',
-              },
-              headerRight: () => <NotificationIcon />,
-            };
-          }}
-        >
-          <Tab.Screen name="Home" component={HomeScreen} />
-          <Tab.Screen name="Search" component={SearchScreen} />
-          <Tab.Screen name="bookmark" component={BookmarksScreen} />
-          <Tab.Screen name="For You" component={ForYouScreen} />
-          <Tab.Screen name="Following" component={FollowingScreen} />
-        </Tab.Navigator>
-      </NavigationContainer>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <NavigationContainer>
+          <Tab.Navigator
+            screenOptions={({ route }) => {
+              const { theme } = useTheme();
+              return {
+                tabBarIcon: ({ focused, color, size }) => {
+                  let iconName = 'home';
+                  if (route.name === 'Home') {
+                    iconName = focused ? 'home' : 'home-outlined';
+                  } else if (route.name === 'Search') {
+                    iconName = focused ? 'search' : 'search';
+                  } else if (route.name === 'Bookmarks') {
+                    iconName = focused ? 'bookmark' : 'bookmark-border';
+                  } else if (route.name === 'Following') {
+                    iconName = focused ? 'people' : 'people-outline';
+                  }
+                  return <Icon name={iconName} size={size} color={color} />;
+                },
+                tabBarActiveTintColor: theme.colors.primary,
+                tabBarInactiveTintColor: theme.colors.textSecondary,
+                tabBarStyle: {
+                  backgroundColor: theme.colors.surface,
+                  borderTopWidth: 1,
+                  borderTopColor: theme.colors.border,
+                  height: Platform.OS === 'ios' ? 88 : 60,
+                  paddingBottom: Platform.OS === 'ios' ? 28 : 8,
+                  paddingTop: 8,
+                  elevation: 0,
+                  shadowOpacity: 0,
+                },
+                headerStyle: {
+                  backgroundColor: theme.colors.surface,
+                  elevation: 0,
+                  shadowOpacity: 0,
+                  borderBottomWidth: 1,
+                  borderBottomColor: theme.colors.border,
+                },
+                headerTitleStyle: {
+                  ...theme.typography.h2,
+                  color: theme.colors.text,
+                },
+                headerRight: () => <NotificationIcon />,
+              };
+            }}
+          >
+            <Tab.Screen 
+              name="Home" 
+              component={HomeScreen}
+              options={{
+                title: 'For You',
+              }}
+            />
+            <Tab.Screen 
+              name="Search" 
+              component={SearchScreen}
+              options={{
+                title: 'Discover',
+              }}
+            />
+            <Tab.Screen 
+              name="Bookmarks" 
+              component={BookmarksScreen}
+              options={{
+                title: 'Saved',
+              }}
+            />
+            <Tab.Screen 
+              name="Following" 
+              component={FollowingScreen}
+              options={{
+                title: 'Following',
+              }}
+            />
+          </Tab.Navigator>
+        </NavigationContainer>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 };
 
